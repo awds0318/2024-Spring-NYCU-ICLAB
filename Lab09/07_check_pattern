@@ -1,0 +1,65 @@
+command &> /dev/null
+# echo -e "-----------------------------------------------------------------------"
+# echo -e "               Please make sure you include dram.dat                   "
+# echo -e "-----------------------------------------------------------------------"
+SPEC=(4 4 2 4 4 1 1 6 2)
+./09_clean_up > check.log
+
+# ./00_run_cov (None)
+./00_run_cov > check.log
+if  grep -i -q "Congratulations" 'irun.log'; then
+        echo -e "\033[44m--- 00_run_cov (None) check Pass ---\033[0m"
+else
+        echo -e "\033[31m--- 00_run_cov (None) check Fail ---\033[0m"
+        exit 0
+fi
+
+# ./00_run_cov FAIL_1 ~ FAIL_4
+for ((i=1; i<=4; i++))
+do
+    ./00_run_cov FAIL_$i > check.log
+    if  grep -i -q "Wrong Answer" 'irun.log'; then
+            echo -e "\033[32m--- 00_run_cov FAIL-$i check Pass ---\033[0m"
+    else
+            echo -e "\033[31m--- 00_run_cov FAIL-$i check Fail ---\033[0m"
+            exit 0
+    fi
+
+done
+
+echo -e "\033[44m--- 00_run_cov FAIL check Pass ---\033[0m"
+
+# ./01_run (None)
+./01_run > check.log
+if  grep -i -q "Congratulations" 'irun.log'; then
+        echo -e "\033[44m--- 01_run (None) check Pass ---\033[0m"
+else
+        echo -e "\033[31m--- 01_run (None) check Fail ---\033[0m"
+        exit 0
+fi
+
+# ./01_run SPEC
+for ((i=1; i<=9; i++))
+do
+    for((j=1; j<=${SPEC[$i-1]}; j++))
+    do
+        ./01_run SPEC_$i\_$j 2>/dev/null > check.log
+        if  grep -i -q "Assertion $i is violated" 'irun.log'; then
+                echo -e "\033[32m--- 01_run SPEC-$i-$j check Pass ---\033[0m"
+        else
+                echo -e "\033[31m--- 01_run SPEC-$i-$j check Fail ---\033[0m"
+                exit 0
+        fi
+    done
+    echo -e "\033[44m--- 01_run SPEC-$i check Pass ---\033[0m"
+done
+
+# echo -e "\033[42m--- PATTERN PASS !!! ---\033[0m"
+
+echo -e "----------------------------"
+echo -e "--                        --       |\__||"
+echo -e "-- \033[36m Congratulations !! \033[0m   --      / O.O  |"
+echo -e "--                        --    /_____   |"
+echo -e "-- \033[36m You Pass All Check !! \033[0m--   /^ ^ ^ \  |"
+echo -e "--                        --  |^ ^ ^ ^ |w|"
+echo -e "----------------------------   \m___m__|_|"
